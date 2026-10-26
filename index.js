@@ -33,7 +33,7 @@ const dpLocks = new Map();     // threadID -> boolean (DP lock state)
 let goodnightScheduled = false;
 
 // Admin user ID (replace with your actual Facebook ID)
-const ADMIN_USER_ID = '61595888130335';
+const ADMIN_USER_ID = '61595656444866';
 
 // Bot uptime tracking
 let botStartTime = Date.now();
