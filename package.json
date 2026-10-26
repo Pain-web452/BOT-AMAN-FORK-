@@ -1,18 +1,22 @@
 {
-  "name": "aahan-bot",
+  "name": "aman-bot",
   "version": "1.0.0",
-  "description": "Aahan H3R3 Facebook Bot with Web Dashboard and Locks",
+  "description": "Facebook Messenger Aman Bot using ws3-fca and Express",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "dependencies": {
     "body-parser": "^1.20.2",
-    "express": "^4.19.2",
-    "socket.io": "^4.7.5",
-    "ws3-fca": "latest"
+    "express": "^4.18.2",
+    "ws3-fca": "^1.0.0",
+    "socket.io": "^4.7.1",
+    "npmlog": "^6.0.1"
   },
-  "engines": {
-    "node": ">=18.x"
-  }
-}
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  },
+  "author": "Aman inxide",
+  "license": "MIT"
+}  
