@@ -388,7 +388,8 @@ T3R1 BH3N K1 1Z99T L0UT LUNG9 K1S1 L0W L3V3L R9ND1 K B9CHY :| :) =P N1K9 T9T9 :
   ],
   roast:[
     // ENHANCED ROAST MESSAGES
-    `Tere jaise logo ko dekh ke lagta hai nature ne experiment kiya tha 😂\nPar result aaya fail!${getSignature()}`,
+'Tere jaise logo ko dekh ke lagta hai nature ne experiment kiya tha 🐒\nPar result aaya fail!' + getSignature(),
+
     `Tera attitude dekh ke lagta hai tuition fees zyada di hai 🤣\nPar padhai nahi hui!${getSignature()}`,
     `Tujhe dekh ke lagta hai WiFi slow ho gaya 😆\nBuffering... buffering...${getSignature()}`,
     `Tere jokes sun ke hasi nahi aati, tension aati hai 😜\nDoctor ko dikhana padega!${getSignature()}`,
