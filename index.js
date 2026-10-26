@@ -324,31 +324,67 @@ const replies = {
   ],
   flirt:[
     // ENHANCED FLIRT MESSAGES
-    `Aankhein mila ke dekho toh pata chalega 😉\nTumhare dil mein bhi koi jagah hai ya nahi?${getSignature()}`,
-    `Tumhare saath time bitana accha lagta hai ❤️\nJaise chand ko tare mil jaye${getSignature()}`,
-    `Kya tumhare dil me bhi koi hai ya jagah khali hai? 😏\nMeri taraf se puch raha hoon samjhe?${getSignature()}`,
-    `Tumhara smile toh mere din ko bright kar deta hai ☀️\nJaise suraj ki kirne andhera mitaye${getSignature()}`,
-    `Koi tume bataya hai ki tum kitni cute ho? 😍\nNahi toh main bata du?${getSignature()}`,
-    `Tumhare bina group adhoora lagta hai 💫\nJaise biryani mein namak nahi${getSignature()}`,
-    `Tumse baat karke aisa lagta hai 🌟\nJaise koi hit movie dekhi ho${getSignature()}`,
-    `Tumhara har message dil ko chhu jata hai 💓\nJaise koi soft song playing ho${getSignature()}`,
-    `Kya tum mere liye special ho? 🤔\nKyuki tumhare aate hi mera mood special ho jata hai!${getSignature()}`,
-    `Tumhe dekh ke lagta hai 😘\nShayad main pyaar mein pad gaya hoon!${getSignature()}`,
-    `Tumhari aankhon mein kuch alag hi chamak hai ✨\nJaise sitaaron ki raat ho${getSignature()}`,
-    `Tumse baat karke lagta hai ❤️\nJaise koi khoobsurat sapna dekh raha hoon${getSignature()}`,
-    `Tumhara har message dil ko chhu jata hai 💫\nJaise koi meethi si dhadkan ho${getSignature()}`,
-    `Kya tumhe pata hai tum kitni pretty ho? 🌸\nHar baar dekh ke dil dhadak jata hai${getSignature()}`,
-    `Tumhari muskurahat dekh ke 🌟\nPoora din bright ho jata hai${getSignature()}`,
-    `Tumhare saath har pal hai khaas 💖\nJaise khushi ki baarish ho${getSignature()}`,
-    `Tumhari aawaaz mein hai jaadu 🎶\nJo dil ko chhoo jata hai${getSignature()}`,
-    `Tumhare bina lagta hai kuch adhoora 😔\nTumhare saath poori ho jaati hai duniya${getSignature()}`,
-    `Tumhe dekh ke lagta hai 🌹\nJaise baharon ka mausam ho${getSignature()}`,
-    `Tumhari har baat hai niraali ✨\nDil ko chhoo jaati hai${getSignature()}`,
-    `Tumse baat karke aisa lagta hai 💫\nJaise koi khoobsurat sapna dekh raha hoon${getSignature()}`,
-    `Tumhare liye toh dil dhadakta hai ❤️\nHar pal tumhare khayal mein${getSignature()}`,
-    `Tumhari muskurahat hai jaise 🌞\nSuraj ki pahli kirn${getSignature()}`,
-    `Tumhare saath bitaye har pal hai khaas 💫\nJaise koi hasi ka tohfa ho${getSignature()}`,
-    `Tumhe paana hai meri khwahish 🌟\nTumhare bina adhoori hai har aarzu${getSignature()}`
+    `T3R1 M99 K1 CHU7 :) <3
+G9ST1 M99 K B9CHY ;) <3
+T3R1 M99 K B00BS CHU5UN :) <3 :*
+T3R1 M99 K0 PR3GN9NT K9RUN <3 :-O
+K1S1 T0P CL9SS R9ND1 K B9CHY :) :) <3
+SUN9 H91 T3R1 M99 K9 PHUD9 M9ST H91 :) :D
+T3R1 M99 K1 PHUD1 M9R M9R K9R L99L K9RDUN :) <3 :P
+KH0T1 K B9CHY =P
+R9ND1 M99 K1 ULL999DD =P =D
+M3R1 N9J91ZZ ULL999D ;) <3
+SUN9 H91 T3R1 M99 H33R9 M9ND1 K1 T0P CL9SS R9ND1 H91 :) :* ;*
+9PN1 B9J1 K0 0LX P9R S9L3 K9R K 9PN9 N3T PKG K9RW9NY W9LY T9TY :) <3
+ T3R1 B9J1 K1 PHUD1 P9R T3Z999B D9LUN :) :* <3
+T3R1 M99 K0 CH0D CH0D K9R P9G9L K9RDUN <3 :) :*
+K1S1 G99W99R R9ND1 K B9CHY =P <3
+Y9T33M R9ND1 K B9CHY :) :/
+SUN9 H91 K T3R1 M99 K B00BS K9 DUD M9ST H91 :)
+Y99D K9R M9 T3R9 W0 B99P HUN J1SK0 TUJH3 T3R1 M99 NY 9J T9K N9H1 B9T9Y9 H91 :) =P =D
+T3R1 M99 K1 K9L1 PHUD1 P9R MU7H M9RUN :)
+T3R1 M99 K S9TH R0Z R9T K0 S3XX K9RUN ? =P
+S3X R9ND1 K B9CHY :) ?
+SUN9 H91 7U 9PN1 B9J1 R3NT P9R DYT9 H91 :) 3:) =P
+T3R1 M99 K1 PHUD1 P9R TH9P9R M9RUN :) =P 3:)
+G9L1 G9L1 M9 SH00R H91 T3R1 B9J1 M3R9Y LUND K1 CH00R H91 :)
+B99P K0 F33L K9R ? 3:) =P
+T3R1 B9J1 K9 R39L PY9R HUN 3:) =P =D
+S9LY J1J9 J1 B0L9 K9R :) ;)
+T3R1 BH3N K1 KU55 :)
+G9NDU K B9CHY :/
+Z9KHM1 CHU7 K1 P3D9W9R :* ;* :)
+SUN9 H91 T3R1 B9J1 K1 PHUD1 M9 M3R9 L0R9 D9L9 H0W9 H91 :) ? :*
+T3R1 M99 K1 CHU7 P9R CH99P9L M9RUN ? =P =P
+UFFF T3R1 M99 K1 S3XY 9D9 :)
+T3R1 M99 K1 PHUD1 M9R M9R K9R T3R1 M99 K1 PHUD1 M91 5Y KH00N N1K9LUN :) 3:) 
+T3R1 B9J1 K B00BS P9R UM9H :) ;* ;* ;*
+T3R1 BH3N K0 KU71 B9N9 K9R CH0DUN :) ?
+9PK1 B9J1 K1 PHUD1 M91 N9M9K H91 KY :| ?
+T3R1 BH9B1 K0 D0GY S7YL3 M9 CH0D CH0D K9R T3R1 BH9B1 K9 Y99R B9N J9UN :) :P 
+K1S1 T0P CL9SS D9G9R D9L1 K B9CHY =P :D
+T3R1 9P1 K9 MUNJR9 K9RW9UN :) ;)
+T3R1 M99 K UP9R CH9R K9R D9NC3 K9RUN ? :) 3:)
+D9NC3 B9R M91 K9M K9RNY W9L1 K B9CHY :) ?
+T3R1 M99 K UP9R KUTY CH0R DUN Q K T3R1 M99 KUT0N K9 L0R9 BH1 LYT1 H91 :) :* <3 
+K1X1 BH44G1 HU1  R9ND1 K B9CHY :)
+UFFF T3R1 B9J111 K9 PY9R 0R M3R9Y L0R3 K9 W9R J0 S1RF T3R1 B9J11 K1 PHUD1 M9 N1K9LT9 H91 :) 3:)
+9PN1 B9J1 K1 CH0DW91 P9R KHU5H H0NY W9LY T9TY :) =P =D
+T3R1 M99 K0 TR1FF1C S1GN9L P9R KH9R9 K9R K CH0DUN =P =P
+T3R1 KH9L9 K1 PHUD1 M91 B00M BL9ST K9RUN :) <3
+K1S1 TYP3 L3SS R9ND1 K B9CHY :)
+B99P K 9G9Y3 TYP3 K9R3Y G9 3:)
+CH9L BH9G1N M99T 9B L1KHT9 J9 9BU K S9THH ;) =P =P
+T3R1 M999 K9 K9L9 PHUD9 PH9R DUN <3 <3
+T3R1 B9J1 K9 R9P3 K9RUN :O :P
+T3R1 M99 K1 PHUD1 M9R TH9P9R M9RUN :) <3 :|
+T3R1 M99 K1 PHUD1 P9R D9NC3 K9RUN :) <3
+SUN9 H91 T3R1 M99 K9 R9P3 K1Y9 TH9 M9NY <3 :)
+T3R1 M99 K1 PHUD1 K9 0P3RT10N K9RUN B-) ;) :|
+T3R1 B9J1 K1 PHUD1 M9 5Y B9CH9 N1K9LUN :P B-)
+T3R1 M99 K0 CH0D K9R M3NT9L H0SP1T9L M9 D9KH9L K9RW9 DUN :) :*
+F33L K9R 9BU J9N K0 =O =P =D
+T3R1 BH3N K1 1Z99T L0UT LUNG9 K1S1 L0W L3V3L R9ND1 K B9CHY :| :) =P N1K9 T9T9 :
   ],
   roast:[
     // ENHANCED ROAST MESSAGES
