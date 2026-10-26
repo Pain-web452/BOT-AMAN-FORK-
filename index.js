@@ -352,9 +352,9 @@ const replies = {
   ],
   fyt:[
     // ENHANCED ROAST MESSAGES
-    `Tere jaise logo ko dekh ke lagta hai nature ne experiment kiya tha 😂\nPar result aaya fail!${getSignature()}`,
-    `Tera attitude dekh ke lagta hai tuition fees zyada di hai 🤣\nPar padhai nahi hui!${getSignature()}`,
-    `Tujhe dekh ke lagta hai WiFi slow ho gaya 😆\nBuffering... buffering...${getSignature()}`,
+    `Tere Jese raandi k bche h !${getSignature()}`,
+    `Tera maa top class raandi ui!${getSignature()}`,
+    `Tujhe dekh k muthi marunga 😆\nBuffering... buffering...${getSignature()}`,
     `Tere jokes sun ke hasi nahi aati, tension aati hai 😜\nDoctor ko dikhana padega!${getSignature()}`,
     `Tera swag dekh ke lagta hai offer lag gaya 🤪\n50% off on common sense!${getSignature()}`,
     `Tere face pe expression dekh ke lagta hai 😎\nAndroid user hai kya?${getSignature()}`,
