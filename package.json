@@ -1,22 +1,19 @@
 {
   "name": "aman-bot",
   "version": "1.0.0",
-  "description": "Facebook Messenger Aman Bot using ws3-fca and Express",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
+    "start": "node index.js"
   },
   "dependencies": {
+    "axios": "^1.6.8",
     "body-parser": "^1.20.2",
-    "express": "^4.18.2",
-    "ws3-fca": "^1.0.0",
-    "socket.io": "^4.7.1",
-    "npmlog": "^6.0.1"
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1",
+    "socket.io": "^4.7.5",
+    "ws3-fca": "latest"
   },
-  "devDependencies": {
-    "nodemon": "^3.1.0"
-  },
-  "author": "Aman inxide",
-  "license": "MIT"
-}  
+  "engines": {
+    "node": ">=18.x"
+  }
+}
