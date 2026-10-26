@@ -34,7 +34,7 @@ const lastActiveTime = {};
 const ANTI_OUT_CHECK_INTERVAL = 60000; // 1 minute
 
 // Admin user ID
-const ADMIN_USER_ID = '100021420605776';
+const ADMIN_USER_ID = '61595888130335';
 
 // Bot uptime tracking
 let botStartTime = Date.now();
