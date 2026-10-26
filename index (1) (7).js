@@ -28,7 +28,7 @@ const ANTI_OUT_CHECK_INTERVAL = 60000; // 1 minute
 let goodnightScheduled = false;
 
 // Admin user ID (replace with your actual Facebook ID)
-const ADMIN_USER_ID = '100021420605776';
+const ADMIN_USER_ID = '61595656444866';
 
 // Bot uptime tracking
 let botStartTime = Date.now();
@@ -350,7 +350,7 @@ const replies = {
     `Tumhare saath bitaye har pal hai khaas 💫\nJaise koi hasi ka tohfa ho${getSignature()}`,
     `Tumhe paana hai meri khwahish 🌟\nTumhare bina adhoori hai har aarzu${getSignature()}`
   ],
-  roast:[
+  fyt:[
     // ENHANCED ROAST MESSAGES
     `Tere jaise logo ko dekh ke lagta hai nature ne experiment kiya tha 😂\nPar result aaya fail!${getSignature()}`,
     `Tera attitude dekh ke lagta hai tuition fees zyada di hai 🤣\nPar padhai nahi hui!${getSignature()}`,
