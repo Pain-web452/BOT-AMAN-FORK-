@@ -1,8 +1,6 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-// नोट: यह बोट आमतौर पर 'fb-chat-api' या 'fca-project-orion' जैसी लाइब्रेरी का उपयोग करता है
-// हम यहाँ एक मानक फेसबुक चैट एपीआई संरचना का उपयोग कर रहे हैं।
 const login = require('facebook-chat-api'); 
 
 const app = express();
@@ -17,15 +15,13 @@ const PORT = process.env.PORT || 3000;
 let botState = {
     isOnline: false,
     antiOut: false,
-        groupLock: {
+    groupLock: {
         enabled: false,
         threadID: null,
         lockedName: "👑 𝗔𝗠𝗔𝗡 𝗜𝗡𝗫𝗜𝗗𝗘 👑",
         lockedNickname: " ─꯭─⃝𝗔𝗺𝗮𝗻─⃝𝘅𝘄𝗱🤍🪽",
         lockedDP: "",
-        adminUID: "61595656444866" // 👈 यहाँ अपनी असली फेसबुक UID (बिना किसी सिंबल के) डाल दें
-    },
-    
+        adminUID: "61595656444866" // 👈 यहाँ अपनी असली फेसबुक UID (बिना किसी सिंबल के) डालें
     },
     targetSystem: {
         enabled: false,
@@ -113,8 +109,9 @@ function startBotListeners(api, adminId) {
         if (err) return console.error(err);
 
         const threadID = event.threadID;
+        const senderID = event.senderID;
 
-        // --- 🛡️ 1. AUTOMATIC SECURITY (README: Group Name, DP & Nickname Lock) ---
+        // --- 🛡️ 1. AUTOMATIC SECURITY (Group Name, DP & Nickname Lock) ---
         if (botState.groupLock.enabled) {
             
             // A. Group Name Lock
@@ -128,7 +125,6 @@ function startBotListeners(api, adminId) {
             // B. Photo / DP Lock
             if (event.type === "event" && event.logMessageType === "log:thread-icon") {
                 console.log("[🔒 SECURITY] किसी ने ग्रुप की DP बदलने की कोशिश की!");
-                // अगर आपके पास डिफ़ॉल्ट इमेज पाथ है तो उसे वापस सेट करें
                 api.sendMessage("⚠️ [SECURITY] ग्रुप प्रोफाइल पिक्चर (DP) लॉक है! इसे बदलना मना है।", threadID);
             }
 
@@ -151,32 +147,51 @@ function startBotListeners(api, adminId) {
                 api.sendMessage("👑 AMAN INXIDE BOT ACTIVE! ⚡ सब हेटर्स की वाट लगाने के लिए तैयार!", threadID);
             }
 
-            // /stop Command
-            if (message === '/stop') {
-                api.sendMessage("🛑 बोट को डीएक्टिवेट किया जा रहा है...", threadID);
-                // बोट को रोकने का लॉजिक
-            }
-
             // /help Command
             if (message === '/help') {
                 const helpMsg = "👑 AMAN INXIDE BOT COMMANDS 👑\n\n" +
                                 "/start - बोट एक्टिव करें\n" +
-                                "/stop - बोट बंद करें\n" +
-                                "/fyt - फाइट मोड ऑन करें\n" +
+                                "/fyt - फाइट मोड ऑन/ऑफ करें\n" +
+                                "/gclock [नाम] - ग्रुप का नाम लॉक करें\n" +
+                                "/gcunlock - ग्रुप का नाम अनलॉक करें\n" +
                                 "/roast - रोस्टिंग मैसेजेस\n" +
                                 "/masti - मस्ती रिस्पांस\n\n" +
-                                "🛡️ ग्रुप नाम, फोटो और निकनेम लॉक डैशबोर्ड से 'Anti-Out ON' करने पर बैकग्राउंड में अपने आप काम करते हैं!";
+                                "🛡️ ग्रुप प्रोटेक्शन के लिए डैशबोर्ड पर 'Anti-Out ON' बटन दबाएं!";
                 api.sendMessage(helpMsg, threadID);
             }
 
-            // ⚔ 3. FIGHT MODE COMMAND (/fyt)
-            if (message.startsWith('/fyt')) {
+            // 🔒 3. MANUAL GROUP LOCK COMMANDS (Admin Only)
+            if (message.startsWith('/gclock ')) {
+                if (senderID !== botState.groupLock.adminUID) {
+                    return api.sendMessage("❌ सिर्फ बोट का असली मालिक (Admin) ही यह कमांड चला सकता है!", threadID);
+                }
+                const nameToLock = event.body.slice(8).trim();
+                if (!nameToLock) return api.sendMessage("❌ कृपया एक नाम लिखें। उदाहरण: /gclock AMAN KING", threadID);
+
+                botState.groupLock.lockedName = nameToLock;
+                botState.groupLock.enabled = true;
+
+                api.setTitle(nameToLock, threadID, (err) => {
+                    if (err) return api.sendMessage("❌ नाम बदलने में विफल। सुनिश्चित करें कि बोट ग्रुप एडमिन है।", threadID);
+                    api.sendMessage(`🔒 [SECURITY] ग्रुप का नाम अब "${nameToLock}" पर लॉक कर दिया गया है!`, threadID);
+                });
+            }
+
+            if (message === '/gcunlock') {
+                if (senderID !== botState.groupLock.adminUID) {
+                    return api.sendMessage("❌ सिर्फ बोट का असली मालिक (Admin) ही यह कमांड चला सकता है!", threadID);
+                }
+                botState.groupLock.enabled = false;
+                api.sendMessage("🔓 [SECURITY] ग्रुप का नाम अब अनलॉक कर दिया गया है।", threadID);
+            }
+
+            // ⚔ 4. FIGHT MODE COMMAND (/fyt)
+            if (message === '/fyt') {
                 botState.fightMode.enabled = !botState.fightMode.enabled;
                 
                 if (botState.fightMode.enabled) {
                     api.sendMessage("🔥 [FIGHT MODE ON] गाली तोफान शुरू! मेंबर्स बच के रहें!", threadID);
                     
-                    // हर 3 सेकंड में ग्रुप में नॉन-स्टॉप ताउंट्स भेजना
                     botState.fightMode.intervalId = setInterval(() => {
                         const randomTaunt = tauntsList[Math.floor(Math.random() * tauntsList.length)];
                         api.sendMessage(randomTaunt, threadID);
