@@ -1,4 +1,4 @@
-// aahan_bot_complete.js
+// index.js
 const express = require('express');
 const bodyParser = require('body-parser');
 const login = require('ws3-fca');
@@ -24,28 +24,21 @@ const THREAD_COOLDOWN_MS = 2000;
 // Anti-out system
 let antiOutEnabled = true;
 const lastActiveTime = {};
-const ANTI_OUT_CHECK_INTERVAL = 60000; // 1 minute
+const ANTI_OUT_CHECK_INTERVAL = 60000;
 
 // === LOCK SYSTEMS STORAGE ===
 const gcLocks = new Map();     // threadID -> locked group title
 const nickLocks = new Map();   // threadID -> Map(userID -> locked nickname)
 const dpLocks = new Map();     // threadID -> boolean (DP lock state)
 
-// Fyt tasks tracking map
-const activeFytTasks = new Map();
-
-// Admin user ID
 const ADMIN_USER_ID = '100021420605776';
 
-// Bot uptime tracking
 let botStartTime = Date.now();
 let isBotRunning = true;
 
-// Auto rejoin tracking
 const leftUsers = new Map();
 const autoRejoinEnabled = true;
 
-// Anti-out monitoring
 setInterval(() => {
   if (!botAPI || !antiOutEnabled || !isBotRunning) return;
   const now = Date.now();
@@ -59,19 +52,11 @@ setInterval(() => {
 function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 function emitLog(msg,isErr=false){ const log = `[${new Date().toISOString()}] ${isErr?'ERROR':'INFO'}: ${msg}`; console.log(log); io.emit('botlog',log); }
 function getMessageId(event){ return event.messageID || event.messageId || null; }
-function containsEmoji(text){ return /[\p{Emoji}]/u.test(text); }
 
 function getSignature() {
-  const signatures = [
-    "\n\n✨ 🅐🅐🅗🅐🅝 🅗3🅡3 ✨",
-    "\n\n🌟 🇦 🇦 🇭 🇦 🇳  🇭 3 🇷 3 🌟", 
-    "\n\n🔥 𝔸𝔸ℍ𝔸ℕ ℍ3ℝ3 🔥",
-    "\n\n💫 𝓐𝓐𝓗𝓐𝓝 𝓗3𝓡3 💫"
-  ];
-  return pickRandom(signatures);
+  return "\n\n✨ 🅐🅐🅗🅐🅝 🅗3🅡3 ✨";
 }
 
-// Auto rejoin when user leaves group
 async function handleUserLeave(event) {
   if (!botAPI || !autoRejoinEnabled) return;
   try {
@@ -79,10 +64,7 @@ async function handleUserLeave(event) {
     const leftUserID = logMessageData.leftParticipantFbId;
     if (!leftUserID) return;
     leftUsers.set(leftUserID, { threadID, leftAt: Date.now(), userName: logMessageData.leftParticipantFullName || 'User' });
-    emitLog(`User ${leftUserID} left group ${threadID}`);
-  } catch (error) {
-    emitLog('User leave handler error: ' + error.message, true);
-  }
+  } catch (error) {}
 }
 
 async function autoRejoinUser(userID) {
@@ -118,27 +100,15 @@ async function sendWelcomeMessage(threadID) {
 }
 
 const replies = {
-  goodmorning:[`Good morning ☀️ uth jao lazy panda 😴${getSignature()}`],
-  goodnight:[`Good night 🌙 sweet dreams 😴${getSignature()}`],
-  hi:[`Hi cutie 😍${getSignature()}`],
-  hello:[`Hello ji 😍 kya haal hai?${getSignature()}`],
-  shayari:[`Tere jaise dost mile to zindagi easy lagti hai 💕${getSignature()}`],
-  flirt:[`Aankhein mila ke dekho toh pata chalega 😉${getSignature()}`],
-  roast:[`Tere jaise logo ko dekh ke lagta hai nature ne experiment kiya tha 😂${getSignature()}`],
-  masti:[`Party shuru kar do! 🎉${getSignature()}`],
-  jokes:[`Teacher: Bachcho, batado 5 aise fruits jinke pehle letter 'A' aata ho?\nStudent: Apple x 5! 🤣${getSignature()}`],
-  baatchit:[`Kya haal chaal hai bhai? Sab theek? 😊${getSignature()}`]
+  hi: [`Hi cutie 😍${getSignature()}`],
+  hello: [`Hello ji 😍 kya haal hai?${getSignature()}`],
+  shayari: [`Tere jaise dost mile to zindagi easy lagti hai 💕${getSignature()}`]
 };
 
 const helpMessage = `
 🤖 *AAHAN H3R3 BOT COMMANDS* 🤖
 
-🛠️ *Basic Commands:*
-/start - Bot activate kare
-/stop - Bot deactivate kare  
-/help - Ye help message dikhaye
-
-🛡️ *Lock Systems (Group mein use karein):*
+🛠️ *Lock Systems (Group mein use karein):*
 /gclock - Group name lock on
 /gcunlock - Group name lock off
 /nlock - Nickname lock on
@@ -146,13 +116,9 @@ const helpMessage = `
 /dplock - Group DP lock on
 /dpunlock - Group DP lock off
 
-😊 *Fun Commands:*
-/flirt, /roast, /masti, /joke, /mazedaar, /shayari, /baat
-
 ${getSignature()}
 `;
 
-// === BOT INIT ===
 function initializeBot(cookies){
   currentCookies = cookies;
   login({ appState: cookies }, (err,api)=>{
@@ -179,13 +145,12 @@ function startListening(api){
     if(err) return emitLog('Listener error: '+err.message,true);
     if(!event) return;
 
-    // Event log handlers (Locks & unsubscribes)
     if (event.type === 'event') {
       const { threadID, logMessageType, logMessageData } = event;
       if (logMessageType === 'log:unsubscribe') await handleUserLeave(event);
       if (logMessageType === 'log:subscribe' && logMessageData.addedParticipants) {
         const botID = api.getCurrentUserID();
-        if (addedParticipants.some(p => p.userFbId === botID)) await sendWelcomeMessage(threadID);
+        if (logMessageData.addedParticipants.some(p => p.userFbId === botID)) await sendWelcomeMessage(threadID);
       }
 
       // 1. Group Name Lock Check
@@ -239,21 +204,10 @@ function startListening(api){
       const myID = api.getCurrentUserID();
       if(myID && String(senderID)===String(myID)) return;
 
-      const mid = getMessageId(event);
-      if(mid && handledMessageIds.has(mid)) return;
-      if(mid) handledMessageIds.set(mid,Date.now());
-
       const text = body.toString().trim();
       const lowerText = text.toLowerCase();
-      const isAdmin = String(senderID) === String(ADMIN_USER_ID);
 
       if (text === `${prefix}help`) return api.sendMessage(helpMessage, threadID);
-
-      // Bot Controls
-      if(text===`${prefix}stop` && isAdmin){ botActive=false; return api.sendMessage(`🤖 Bot stopped! ${getSignature()}`, threadID); }
-      if(text===`${prefix}start` && isAdmin){ botActive=true; return api.sendMessage(`🤖 Bot started! ${getSignature()}`, threadID); }
-      if(text===`${prefix}antion` && isAdmin){ antiOutEnabled=true; return api.sendMessage(`🛡️ Anti-out ON! ${getSignature()}`, threadID); }
-      if(text===`${prefix}antioff` && isAdmin){ antiOutEnabled=false; return api.sendMessage(`🛡️ Anti-out OFF! ${getSignature()}`, threadID); }
 
       // Lock Commands
       if(text===`${prefix}gclock`) {
@@ -299,8 +253,6 @@ function startListening(api){
       let replyText = null;
       if(lowerText.includes('hi')) replyText = pickRandom(replies.hi);
       else if(lowerText.includes('hello')) replyText = pickRandom(replies.hello);
-      else if(lowerText.includes('shayari')) replyText = pickRandom(replies.shayari);
-      else if(lowerText.includes('joke')) replyText = pickRandom(replies.jokes);
 
       if(replyText){
         let name='User';
@@ -311,7 +263,6 @@ function startListening(api){
   });
 }
 
-// === EXPRESS & WEB DASHBOARD WITH BULK & FYT PANELS ===
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -322,7 +273,7 @@ app.get('/', (req, res) => {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Aahan Bot - Control & Panels</title>
+        <title>Aahan Bot</title>
         <style>
             body { background: #0f172a; color: #f8fafc; font-family: sans-serif; padding: 20px; }
             .container { max-width: 800px; margin: auto; }
@@ -331,15 +282,12 @@ app.get('/', (req, res) => {
             label { display: block; margin-top: 10px; font-weight: bold; }
             input, textarea { width: 100%; padding: 10px; margin-top: 5px; background: #0f172a; border: 1px solid #475569; color: white; border-radius: 5px; box-sizing: border-box; }
             button { background: #0284c7; color: white; border: none; padding: 12px 20px; margin-top: 15px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; }
-            button:hover { background: #0369a1; }
             .terminal { background: #000; color: #00ff66; padding: 15px; border-radius: 5px; height: 180px; overflow-y: auto; font-family: monospace; font-size: 13px; }
         </style>
     </head>
     <body>
         <div class="container">
             <h2>⚡ AAHAN H3R3 - BOT DASHBOARD ⚡</h2>
-            
-            <!-- Bot Configuration Panel -->
             <div class="card">
                 <h3>⚙️ Bot Configuration (Cookies JSON)</h3>
                 <form action="/configure" method="POST">
@@ -347,46 +295,11 @@ app.get('/', (req, res) => {
                     <button type="submit">Save & Login Bot</button>
                 </form>
             </div>
-
-            <!-- Bulk Sender Panel -->
-            <div class="card">
-                <h3>📁 Bulk Message Files Panel</h3>
-                <form action="/api/start-bulk" method="POST" enctype="multipart/form-data">
-                    <label>Hater Name:</label>
-                    <input type="text" name="hereName" placeholder="e.g. AAHAN" required>
-                    <label>Target UID / Group JID:</label>
-                    <input type="text" name="groupUid" placeholder="Enter Thread ID or User UID" required>
-                    <label>Upload Message File (.txt):</label>
-                    <input type="file" name="fileUpload" accept=".txt" required>
-                    <label>Time Delay (Seconds):</label>
-                    <input type="number" name="timeDelay" value="3" min="1" required>
-                    <button type="submit">🚀 Start Bulk Messaging</button>
-                </form>
-            </div>
-
-            <!-- Fyt Mode Panel -->
-            <div class="card" style="border: 1px solid #ef4444;">
-                <h3 style="color: #ef4444;">⚔️ Target User Fyt Mode Panel</h3>
-                <form action="/api/start-fyt" method="POST" enctype="multipart/form-data">
-                    <label>Hater Name:</label>
-                    <input type="text" name="hereName" placeholder="e.g. AAHAN" required>
-                    <label>Target UID / Thread ID:</label>
-                    <input type="text" name="targetUid" placeholder="Enter Target ID" required>
-                    <label>Upload Message File (.txt):</label>
-                    <input type="file" name="fileUpload" accept=".txt" required>
-                    <label>Time Delay (Seconds):</label>
-                    <input type="number" name="timeDelay" value="2" min="1" required>
-                    <button type="submit" style="background: #dc2626;">🔥 Start Fyt Mode</button>
-                </form>
-            </div>
-
-            <!-- Live Terminal -->
             <div class="card">
                 <h3>🖥️ Live Terminal Logs</h3>
                 <div class="terminal" id="logBox">Waiting for logs...</div>
             </div>
         </div>
-
         <script src="/socket.io/socket.io.js"></script>
         <script>
             const socket = io();
@@ -401,7 +314,6 @@ app.get('/', (req, res) => {
   `);
 });
 
-// Configure Route
 app.post('/configure', (req, res) => {
   try {
     const cookies = typeof req.body.cookies === 'string' ? JSON.parse(req.body.cookies) : req.body.cookies;
@@ -415,80 +327,6 @@ app.post('/configure', (req, res) => {
   }
 });
 
-// Bulk Messaging API
-app.post('/api/start-bulk', upload.single('fileUpload'), async (req, res) => {
-  try {
-    const { hereName, timeDelay, groupUid } = req.body;
-    const file = req.file;
-    if (!botAPI) return res.send('<script>alert("Bot logged in nahi hai!"); window.location="/";</script>');
-    if (!file) return res.send('<script>alert("File upload zaroori hai!"); window.location="/";</script>');
-
-    const fileContent = fs.readFileSync(file.path, 'utf8');
-    let messages = fileContent.split('\n').map(m => m.trim()).filter(m => m.length > 0);
-    if (messages.length === 0) return res.send('<script>alert("File khali hai!"); window.location="/";</script>');
-
-    res.send('<script>alert("Bulk message process shuru ho gaya!"); window.location="/";</script>');
-    const delayMs = Math.max(parseFloat(timeDelay) * 1000 || 3000, 1000);
-    emitLog(`🚀 Bulk Started by ${hereName} for Target: ${groupUid}`);
-
-    (async () => {
-      for (let i = 0; i < messages.length; i++) {
-        try {
-          await botAPI.sendMessage(`${hereName} -> ${messages[i]}`, groupUid);
-          emitLog(`[${i + 1}/${messages.length}] Sent successfully`);
-        } catch (err) {
-          emitLog(`Error: ${err.message}`, true);
-        }
-        await new Promise(r => setTimeout(r, delayMs));
-      }
-      emitLog(`🏁 Bulk complete!`);
-      if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
-    })();
-  } catch (err) {
-    if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-  }
-});
-
-// Fyt Mode API
-app.post('/api/start-fyt', upload.single('fileUpload'), async (req, res) => {
-  try {
-    const { targetUid, hereName, timeDelay } = req.body;
-    const file = req.file;
-    if (!botAPI) return res.send('<script>alert("Bot logged in nahi hai!"); window.location="/";</script>');
-    if (!targetUid || !file) return res.send('<script>alert("Target UID aur File zaroori hai!"); window.location="/";</script>');
-
-    const fileContent = fs.readFileSync(file.path, 'utf8');
-    let messages = fileContent.split('\n').map(m => m.trim()).filter(m => m.length > 0);
-    if (messages.length === 0) return res.send('<script>alert("File khali hai!"); window.location="/";</script>');
-
-    const taskId = 'fyt_' + Date.now();
-    activeFytTasks.set(taskId, true);
-
-    res.send('<script>alert("Fyt mode shuru ho gaya!"); window.location="/";</script>');
-    const delayMs = Math.max(parseFloat(timeDelay) * 1000 || 2000, 1000);
-    emitLog(`⚔️ Fyt Mode Started against Target: ${targetUid}`);
-
-    (async () => {
-      let index = 0;
-      while (activeFytTasks.get(taskId)) {
-        const msg = messages[index % messages.length];
-        try {
-          await botAPI.sendMessage(`${hereName || 'Fyt'} -> ${msg}`, targetUid);
-          emitLog(`[Fyt] Sent to ${targetUid}: ${msg}`);
-        } catch (err) {
-          emitLog(`[Fyt Error] ${err.message}`, true);
-        }
-        index++;
-        await new Promise(r => setTimeout(r, delayMs));
-      }
-      if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
-    })();
-  } catch (err) {
-    if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-  }
-});
-
-// Autoload config
 try{
   if(fs.existsSync('config.json')){
     const data = JSON.parse(fs.readFileSync('config.json','utf8'));
