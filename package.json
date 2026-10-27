@@ -1,6 +1,7 @@
 {
   "name": "aahan-bot",
   "version": "1.0.0",
+  "description": "Aahan Bot with Locks and Panels",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
