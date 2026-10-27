@@ -17,12 +17,15 @@ const PORT = process.env.PORT || 3000;
 let botState = {
     isOnline: false,
     antiOut: false,
-    groupLock: {
+        groupLock: {
         enabled: false,
         threadID: null,
         lockedName: "👑 𝗔𝗠𝗔𝗡 𝗜𝗡𝗫𝗜𝗗𝗘 👑",
         lockedNickname: " ─꯭─⃝𝗔𝗺𝗮𝗻─⃝𝘅𝘄𝗱🤍🪽",
-        lockedDP: ""
+        lockedDP: "",
+        adminUID: "61595656444866" // 👈 यहाँ अपनी असली फेसबुक UID (बिना किसी सिंबल के) डाल दें
+    },
+    
     },
     targetSystem: {
         enabled: false,
