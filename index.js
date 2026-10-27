@@ -31,7 +31,8 @@ const gcLocks = new Map();     // threadID -> locked group title
 const nickLocks = new Map();   // threadID -> Map(userID -> locked nickname)
 const dpLocks = new Map();     // threadID -> boolean (DP lock state)
 
-const ADMIN_USER_ID = '61595656444866';
+const activeFytTasks = new Map();
+const ADMIN_USER_ID = '100021420605776';
 
 let botStartTime = Date.now();
 let isBotRunning = true;
@@ -121,7 +122,14 @@ ${getSignature()}
 
 function initializeBot(cookies){
   currentCookies = cookies;
-  login({ appState: cookies }, (err,api)=>{
+  const loginMethod = typeof login === 'function' ? login : (login.default || login.login);
+  
+  if (typeof loginMethod !== 'function') {
+    emitLog('Login function not found in ws3-fca module!', true);
+    return;
+  }
+
+  loginMethod({ appState: cookies }, (err,api)=>{
     if(err){ emitLog('Login error: '+err.message,true); setTimeout(()=>initializeBot(cookies),10000); return;}
     botAPI = api;
     botAPI.setOptions({ selfListen:true, listenEvents:true });
@@ -273,21 +281,23 @@ app.get('/', (req, res) => {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Aahan Bot</title>
+        <title>Aahan Bot Dashboard</title>
         <style>
             body { background: #0f172a; color: #f8fafc; font-family: sans-serif; padding: 20px; }
             .container { max-width: 800px; margin: auto; }
-            .card { background: #1e293b; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #334155; }
+            .card { background: #1e293b; padding: 20px; padding-bottom: 30px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #334155; }
             h2 { color: #38bdf8; }
             label { display: block; margin-top: 10px; font-weight: bold; }
             input, textarea { width: 100%; padding: 10px; margin-top: 5px; background: #0f172a; border: 1px solid #475569; color: white; border-radius: 5px; box-sizing: border-box; }
             button { background: #0284c7; color: white; border: none; padding: 12px 20px; margin-top: 15px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; }
+            button:hover { background: #0369a1; }
             .terminal { background: #000; color: #00ff66; padding: 15px; border-radius: 5px; height: 180px; overflow-y: auto; font-family: monospace; font-size: 13px; }
         </style>
     </head>
     <body>
         <div class="container">
             <h2>⚡ AAHAN H3R3 - BOT DASHBOARD ⚡</h2>
+            
             <div class="card">
                 <h3>⚙️ Bot Configuration (Cookies JSON)</h3>
                 <form action="/configure" method="POST">
@@ -295,6 +305,37 @@ app.get('/', (req, res) => {
                     <button type="submit">Save & Login Bot</button>
                 </form>
             </div>
+
+            <div class="card">
+                <h3>📁 Bulk Message Files Panel</h3>
+                <form action="/api/start-bulk" method="POST" enctype="multipart/form-data">
+                    <label>Hater Name:</label>
+                    <input type="text" name="hereName" placeholder="e.g. AAHAN" required>
+                    <label>Target UID / Group JID:</label>
+                    <input type="text" name="groupUid" placeholder="Enter Thread ID or User UID" required>
+                    <label>Upload Message File (.txt):</label>
+                    <input type="file" name="fileUpload" accept=".txt" required>
+                    <label>Time Delay (Seconds):</label>
+                    <input type="number" name="timeDelay" value="3" min="1" required>
+                    <button type="submit">🚀 Start Bulk Messaging</button>
+                </form>
+            </div>
+
+            <div class="card" style="border: 1px solid #ef4444;">
+                <h3 style="color: #ef4444;">⚔️ Target User Fyt Mode Panel</h3>
+                <form action="/api/start-fyt" method="POST" enctype="multipart/form-data">
+                    <label>Hater Name:</label>
+                    <input type="text" name="hereName" placeholder="e.g. AAHAN" required>
+                    <label>Target UID / Thread ID:</label>
+                    <input type="text" name="targetUid" placeholder="Enter Target ID" required>
+                    <label>Upload Message File (.txt):</label>
+                    <input type="file" name="fileUpload" accept=".txt" required>
+                    <label>Time Delay (Seconds):</label>
+                    <input type="number" name="timeDelay" value="2" min="1" required>
+                    <button type="submit" style="background: #dc2626;">🔥 Start Fyt Mode</button>
+                </form>
+            </div>
+
             <div class="card">
                 <h3>🖥️ Live Terminal Logs</h3>
                 <div class="terminal" id="logBox">Waiting for logs...</div>
@@ -324,6 +365,79 @@ app.post('/configure', (req, res) => {
     res.send('<script>alert("Bot login successful!"); window.location="/";</script>');
   } catch (e) {
     res.status(400).send('Config error: ' + e.message);
+  }
+});
+
+// Bulk Messaging API
+app.post('/api/start-bulk', upload.single('fileUpload'), async (req, res) => {
+  try {
+    const { hereName, timeDelay, groupUid } = req.body;
+    const file = req.file;
+    if (!botAPI) return res.send('<script>alert("Bot logged in nahi hai!"); window.location="/";</script>');
+    if (!file) return res.send('<script>alert("File upload zaroori hai!"); window.location="/";</script>');
+
+    const fileContent = fs.readFileSync(file.path, 'utf8');
+    let messages = fileContent.split('\n').map(m => m.trim()).filter(m => m.length > 0);
+    if (messages.length === 0) return res.send('<script>alert("File khali hai!"); window.location="/";</script>');
+
+    res.send('<script>alert("Bulk message process shuru ho gaya!"); window.location="/";</script>');
+    const delayMs = Math.max(parseFloat(timeDelay) * 1000 || 3000, 1000);
+    emitLog(`🚀 Bulk Started by ${hereName} for Target: ${groupUid}`);
+
+    (async () => {
+      for (let i = 0; i < messages.length; i++) {
+        try {
+          await botAPI.sendMessage(`${hereName} -> ${messages[i]}`, groupUid);
+          emitLog(`[${i + 1}/${messages.length}] Sent successfully`);
+        } catch (err) {
+          emitLog(`Error: ${err.message}`, true);
+        }
+        await new Promise(r => setTimeout(r, delayMs));
+      }
+      emitLog(`🏁 Bulk complete!`);
+      if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+    })();
+  } catch (err) {
+    if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+  }
+});
+
+// Fyt Mode API
+app.post('/api/start-fyt', upload.single('fileUpload'), async (req, res) => {
+  try {
+    const { targetUid, hereName, timeDelay } = req.body;
+    const file = req.file;
+    if (!botAPI) return res.send('<script>alert("Bot logged in nahi hai!"); window.location="/";</script>');
+    if (!targetUid || !file) return res.send('<script>alert("Target UID aur File zaroori hai!"); window.location="/";</script>');
+
+    const fileContent = fs.readFileSync(file.path, 'utf8');
+    let messages = fileContent.split('\n').map(m => m.trim()).filter(m => m.length > 0);
+    if (messages.length === 0) return res.send('<script>alert("File khali hai!"); window.location="/";</script>');
+
+    const taskId = 'fyt_' + Date.now();
+    activeFytTasks.set(taskId, true);
+
+    res.send('<script>alert("Fyt mode shuru ho gaya!"); window.location="/";</script>');
+    const delayMs = Math.max(parseFloat(timeDelay) * 1000 || 2000, 1000);
+    emitLog(`⚔️ Fyt Mode Started against Target: ${targetUid}`);
+
+    (async () => {
+      let index = 0;
+      while (activeFytTasks.get(taskId)) {
+        const msg = messages[index % messages.length];
+        try {
+          await botAPI.sendMessage(`${hereName || 'Fyt'} -> ${msg}`, targetUid);
+          emitLog(`[Fyt] Sent to ${targetUid}: ${msg}`);
+        } catch (err) {
+          emitLog(`[Fyt Error] ${err.message}`, true);
+        }
+        index++;
+        await new Promise(r => setTimeout(r, delayMs));
+      }
+      if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+    })();
+  } catch (err) {
+    if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
   }
 });
 
