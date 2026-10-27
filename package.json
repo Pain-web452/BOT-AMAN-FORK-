@@ -1,22 +1,15 @@
 {
-  "name": "aman-bot",
+  "name": "aman-inxide-bot",
   "version": "1.0.0",
-  "description": "Facebook Messenger Aman Bot using ws3-fca and Express",
+  "description": "SAB HATER KI MAA CHODNE VALA AMAN INXIDE BOT HERE!",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
+    "start": "node index.js"
   },
   "dependencies": {
-    "body-parser": "^1.20.2",
-    "express": "^4.18.2",
-    "ws3-fca": "^1.0.0",
-    "socket.io": "^4.7.1",
-    "npmlog": "^6.0.1"
+    "express": "^4.19.2",
+    "facebook-chat-api": "^1.8.0"
   },
-  "devDependencies": {
-    "nodemon": "^3.1.0"
-  },
-  "author": "Aman inxide",
-  "license": "MIT"
-}  
+  "author": "AMAN INXIDE",
+  "license": "ISC"
+}
