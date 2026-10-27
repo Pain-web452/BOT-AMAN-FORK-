@@ -11,7 +11,7 @@ app.use(express.static('public'));
 // Render के लिए डायनामिक पोर्ट बाइंडिंग
 const PORT = process.env.PORT || 3000;
 
-// ग्लोबल स्टेट फ़ीचर्स (README के अनुसार)
+// ग्लोबल स्टेट फ़ीचर्स
 let botState = {
     isOnline: false,
     antiOut: false,
@@ -60,51 +60,53 @@ app.get('/status', (req, res) => {
     });
 });
 
-// बोट स्टार्ट और कॉन्फ़िगरेशन सबमिशन API
-app.post('/start-bot', (req, res) => {
-    const { cookies, adminId } = req.body;
+// 🟢 डैशबोर्ड का असली रूट (/control) जो एरर को ठीक करेगा
+app.post('/control', (req, res) => {
+    // फ्रंटएंड अलग-अलग प्रकार के डेटा भेज सकता है (जैसे कुकीज़ या बटन कमांड्स)
+    const { cookies, adminId, command } = req.body;
     
-    if (!cookies) {
-        return res.status(400).json({ error: "Cookies are required!" });
-    }
-
-    try {
-        const parsedCookies = typeof cookies === 'string' ? JSON.parse(cookies) : cookies;
-        
-        // फेसबुक लॉगिन इनिशियलाइज़ेशन
-        login({ appState: parsedCookies }, (err, api) => {
-            if (err) {
-                console.error("Facebook Login Error:", err);
-                return res.status(500).json({ error: "Failed to connect to Facebook. Check cookies." });
-            }
-
-            botState.isOnline = true;
-            console.log("👑 AMAN INXIDE BOT IS NOW ONLINE! 👑");
+    // अगर कुकीज़ सबमिट की गई हैं (बोट चालू करने के लिए)
+    if (cookies) {
+        try {
+            const parsedCookies = typeof cookies === 'string' ? JSON.parse(cookies) : cookies;
             
-            // फेसबुक चैट इवेंट्स सुनना शुरू करें
-            startBotListeners(api, adminId);
-        });
+            login({ appState: parsedCookies }, (err, api) => {
+                if (err) {
+                    console.error("Facebook Login Error:", err);
+                    return res.status(500).send("Failed to connect to Facebook. Check cookies.");
+                }
 
-        res.json({ success: "Bot startup initiated successfully!" });
+                botState.isOnline = true;
+                console.log("👑 AMAN INXIDE BOT IS NOW ONLINE! 👑");
+                startBotListeners(api);
+            });
 
-    } catch (e) {
-        res.status(400).json({ error: "Invalid JSON format in cookies!" });
+            return res.send("Bot setup initiated successfully!");
+        } catch (e) {
+            return res.status(400).send("Invalid JSON format in cookies!");
+        }
     }
-});
 
-// डैशबोर्ड से एंटी-आउट और फ़ीचर्स कंट्रोल करना
-app.post('/toggle-feature', (req, res) => {
-    const { feature, action } = req.body;
-    if (feature === 'antiOut') {
-        botState.antiOut = action === 'ON';
-        botState.groupLock.enabled = action === 'ON'; // सुरक्षा चालू करें
+    // अगर कोई बटन (जैसे Anti-Out) दबाया गया है
+    if (command) {
+        if (command === 'antiout_on') {
+            botState.antiOut = true;
+            botState.groupLock.enabled = true;
+            return res.send("Anti-Out and Group Lock Activated!");
+        }
+        if (command === 'antiout_off') {
+            botState.antiOut = false;
+            botState.groupLock.enabled = false;
+            return res.send("Anti-Out Deactivated!");
+        }
     }
-    res.json({ success: `${feature} toggled ${action}` });
+
+    res.send("Request processed.");
 });
 
 // ---------------- BOT ACTIONS & LISTENERS ----------------
 
-function startBotListeners(api, adminId) {
+function startBotListeners(api) {
     api.listenMqtt((err, event) => {
         if (err) return console.error(err);
 
@@ -116,23 +118,18 @@ function startBotListeners(api, adminId) {
             
             // A. Group Name Lock
             if (event.type === "event" && event.logMessageType === "log:thread-name") {
-                console.log("[🔒 SECURITY] किसी ने ग्रुप का नाम बदलने की कोशिश की!");
-                api.setTitle(botState.groupLock.lockedName, threadID, (err) => {
-                    if (!err) api.sendMessage("⚠️ [SECURITY] इस ग्रुप का नाम लॉक है! आप इसे नहीं बदल सकते।", threadID);
-                });
+                api.setTitle(botState.groupLock.lockedName, threadID);
             }
 
             // B. Photo / DP Lock
             if (event.type === "event" && event.logMessageType === "log:thread-icon") {
-                console.log("[🔒 SECURITY] किसी ने ग्रुप की DP बदलने की कोशिश की!");
-                api.sendMessage("⚠️ [SECURITY] ग्रुप प्रोफाइल पिक्चर (DP) लॉक है! इसे बदलना मना है।", threadID);
+                api.sendMessage("⚠️ [SECURITY] ग्रुप प्रोफाइल पिक्चर (DP) लॉक है!", threadID);
             }
 
             // C. Bot Nickname Auto Correction
             if (event.type === "event" && event.logMessageType === "log:user-nickname") {
                 const changedID = event.logMessageData.participant_id;
                 if (changedID === api.getCurrentUserID()) {
-                    console.log("[🔒 SECURITY] बोट का निकनेम बदला गया! वापस ठीक कर रहा हूँ...");
                     api.changeNickname(botState.groupLock.lockedNickname, threadID, api.getCurrentUserID());
                 }
             }
@@ -142,12 +139,10 @@ function startBotListeners(api, adminId) {
         if (event.body) {
             const message = event.body.trim().toLowerCase();
 
-            // /start Command
             if (message === '/start') {
                 api.sendMessage("👑 AMAN INXIDE BOT ACTIVE! ⚡ सब हेटर्स की वाट लगाने के लिए तैयार!", threadID);
             }
 
-            // /help Command
             if (message === '/help') {
                 const helpMsg = "👑 AMAN INXIDE BOT COMMANDS 👑\n\n" +
                                 "/start - बोट एक्टिव करें\n" +
@@ -163,10 +158,10 @@ function startBotListeners(api, adminId) {
             // 🔒 3. MANUAL GROUP LOCK COMMANDS (Admin Only)
             if (message.startsWith('/gclock ')) {
                 if (senderID !== botState.groupLock.adminUID) {
-                    return api.sendMessage("❌ सिर्फ बोट का असली मालिक (Admin) ही यह कमांड चला सकता है!", threadID);
+                    return api.sendMessage("❌ सिर्फ बोट का असली मालिक ही यह कमांड चला सकता है!", threadID);
                 }
                 const nameToLock = event.body.slice(8).trim();
-                if (!nameToLock) return api.sendMessage("❌ कृपया एक नाम लिखें। उदाहरण: /gclock AMAN KING", threadID);
+                if (!nameToLock) return api.sendMessage("❌ कृपया एक नाम लिखें।", threadID);
 
                 botState.groupLock.lockedName = nameToLock;
                 botState.groupLock.enabled = true;
@@ -179,7 +174,7 @@ function startBotListeners(api, adminId) {
 
             if (message === '/gcunlock') {
                 if (senderID !== botState.groupLock.adminUID) {
-                    return api.sendMessage("❌ सिर्फ बोट का असली मालिक (Admin) ही यह कमांड चला सकता है!", threadID);
+                    return api.sendMessage("❌ सिर्फ बोट का असली मालिक ही यह कमांड चला सकता है!", threadID);
                 }
                 botState.groupLock.enabled = false;
                 api.sendMessage("🔓 [SECURITY] ग्रुप का नाम अब अनलॉक कर दिया गया है।", threadID);
@@ -190,7 +185,7 @@ function startBotListeners(api, adminId) {
                 botState.fightMode.enabled = !botState.fightMode.enabled;
                 
                 if (botState.fightMode.enabled) {
-                    api.sendMessage("🔥 [FIGHT MODE ON] गाली तोफान शुरू! मेंबर्स बच के रहें!", threadID);
+                    api.sendMessage("🔥 [FIGHT MODE ON] गाली तोफान शुरू!", threadID);
                     
                     botState.fightMode.intervalId = setInterval(() => {
                         const randomTaunt = tauntsList[Math.floor(Math.random() * tauntsList.length)];
@@ -198,18 +193,16 @@ function startBotListeners(api, adminId) {
                     }, 3000);
                 } else {
                     clearInterval(botState.fightMode.intervalId);
-                    api.sendMessage("🛑 [FIGHT MODE OFF] शांति का माहौल वापस स्थापित।", threadID);
+                    api.sendMessage("🛑 [FIGHT MODE OFF] शांति स्थापित।", threadID);
                 }
             }
 
-            // /roast Command
             if (message === '/roast') {
-                api.sendMessage("🔥 बेटा तुमसे ना हो पाएगा, जाओ जाके पोगो देखो! AMAN INXIDE से पंगा भारी पड़ेगा!", threadID);
+                api.sendMessage("🔥 बेटा तुमसे ना हो पाएगा, जाओ जाके पोगो देखो!", threadID);
             }
 
-            // /masti Command
             if (message === '/masti') {
-                api.sendMessage("🤪 माहौल पूरा सेट है भाई लोग, मस्ती रुकनी नहीं चाहिए!", threadID);
+                api.sendMessage("🤪 माहौल पूरा सेट है भाई लोग!", threadID);
             }
         }
     });
