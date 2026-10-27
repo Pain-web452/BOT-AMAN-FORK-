@@ -998,5 +998,5 @@ try{
   }
 }catch(e){ emitLog('Config load error: '+e.message,true); }
 
-const PORT = process.env.PORT||20018;
+const PORT = process.env.PORT||10000;
 server.listen(PORT,()=>emitLog(`Server running on port ${PORT} - Bot will run forever until manually stopped!`));
