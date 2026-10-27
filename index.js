@@ -31,7 +31,7 @@ const gcLocks = new Map();     // threadID -> locked group title
 const nickLocks = new Map();   // threadID -> Map(userID -> locked nickname)
 const dpLocks = new Map();     // threadID -> boolean (DP lock state)
 
-const ADMIN_USER_ID = '100021420605776';
+const ADMIN_USER_ID = '61595656444866';
 
 let botStartTime = Date.now();
 let isBotRunning = true;
